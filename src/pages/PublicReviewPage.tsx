@@ -5,6 +5,7 @@ import { Business, ReviewSuggestion } from '../types';
 import { getCategoryLabel, getCategoryColor, copyToClipboard } from '../services/utils';
 import { Copy, ExternalLink, Star, Building2, CheckCircle, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { trackEvent } from '../services/businessStorage';
+import { GoogleGIcon } from '../components/GoogleGIcon';
 
 const CATEGORY_ORDER = [
   'short',
@@ -19,7 +20,7 @@ export const PublicReviewPage = () => {
   const [business, setBusiness] = useState<Business | null>(null);
   const [notFound, setNotFound] = useState(false);
 
-  // Toast & active copy flash
+  const [logoError, setLogoError] = useState(false);
   const [activeCopiedId, setActiveCopiedId] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
 
@@ -108,19 +109,34 @@ export const PublicReviewPage = () => {
 
       <div className="max-w-3xl mx-auto px-4 py-8 sm:py-12">
         
-        {/* Premium Brand Header */}
+        {/* Premium Brand Header with Google 4-Color Accent */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8 text-center mb-8 relative overflow-hidden">
+          {/* Top Google 4-Color Accent Bar */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 flex">
+            <div className="h-full w-1/4 bg-[#4285F4]"></div>
+            <div className="h-full w-1/4 bg-[#EA4335]"></div>
+            <div className="h-full w-1/4 bg-[#FBBC05]"></div>
+            <div className="h-full w-1/4 bg-[#34A853]"></div>
+          </div>
+
+          {/* Official Google Badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-50 border border-slate-200/80 rounded-full mb-4 mt-1">
+            <GoogleGIcon className="w-4 h-4" />
+            <span className="text-xs font-bold text-slate-700">Official Google Feedback Partner</span>
+          </div>
+
           <div className="w-20 h-20 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center mx-auto mb-4 overflow-hidden">
-            {business.logo ? (
-              <img src={business.logo} alt={business.name} className="w-20 h-20 rounded-full object-cover" />
+            {business.logo && !logoError ? (
+              <img
+                src={business.logo}
+                alt={business.name}
+                className="w-20 h-20 rounded-full object-cover"
+                onError={() => setLogoError(true)}
+              />
             ) : (
               <Building2 className="w-10 h-10 text-brand-600" />
             )}
           </div>
-
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold rounded-full mb-3 uppercase tracking-wider">
-            Official Feedback Portal
-          </span>
 
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-none mb-2">
             {business.name}
@@ -134,7 +150,7 @@ export const PublicReviewPage = () => {
               ))}
             </div>
             <span className="text-sm font-bold text-slate-700">4.9/5.0</span>
-            <span className="text-xs text-slate-400 font-medium">(Verified feedback)</span>
+            <span className="text-xs text-slate-400 font-medium">(Verified Google feedback)</span>
           </div>
 
           <p className="text-sm sm:text-base text-slate-500 max-w-lg mx-auto leading-relaxed">

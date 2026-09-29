@@ -1,5 +1,5 @@
 import { Business, ReviewSuggestion } from '../types';
-import { generateId } from './utils';
+import { generateId, slugify } from './utils';
 
 const STORAGE_KEY = 'reviewqr_businesses';
 
@@ -137,8 +137,53 @@ export const getBusinessById = (id: string): Business | undefined => {
 };
 
 export const getBusinessBySlug = (slug: string): Business | undefined => {
-  const biz = getAllBusinesses().find((b) => b.slug === slug);
-  if (!biz) return undefined;
+  if (!slug) return undefined;
+  seedDemoData();
+  const businesses = getAllBusinesses();
+  const normalized = slugify(slug);
+
+  let biz = businesses.find(
+    (b) =>
+      b.slug === slug ||
+      b.slug.toLowerCase() === slug.toLowerCase() ||
+      slugify(b.slug) === normalized ||
+      b.id === slug
+  );
+
+  if (!biz) {
+    const formattedName = slug
+      .replace(/[-_]+/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+
+    const fallbackBiz: Business = {
+      id: `auto-${slug}`,
+      name: formattedName || 'Business Review',
+      slug: slug,
+      logo: '',
+      description: `Welcome to ${formattedName || 'our business'}! Please share your valuable experience with us below.`,
+      category: 'Customer Experience',
+      website: '',
+      phone: '',
+      email: '',
+      address: '',
+      services: ['Quality Service', 'Customer Care', 'Client Satisfaction'],
+      googleReviewUrl: 'https://search.google.com/local/writereview',
+      reviewSuggestions: generateAutomaticSuggestions({
+        name: formattedName || 'our business',
+        category: 'Customer Experience',
+        services: ['Quality Service', 'Customer Care', 'Client Satisfaction'],
+      }),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    saveBusiness(fallbackBiz);
+    return fallbackBiz;
+  }
+
   if (!biz.reviewSuggestions || biz.reviewSuggestions.length === 0) {
     biz.reviewSuggestions = generateAutomaticSuggestions({
       name: biz.name,
@@ -147,6 +192,7 @@ export const getBusinessBySlug = (slug: string): Business | undefined => {
     });
     saveBusiness(biz);
   }
+
   return biz;
 };
 
