@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getBusinessBySlug } from '../services/businessStorage';
 import { Business, ReviewSuggestion } from '../types';
-import { getCategoryLabel, getCategoryColor, copyToClipboard } from '../services/utils';
+import { getCategoryLabel, getCategoryColor, copyToClipboard, getValidGoogleReviewUrl } from '../services/utils';
 import { Copy, ExternalLink, Star, Building2, CheckCircle, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { trackEvent } from '../services/businessStorage';
 import { GoogleGIcon } from '../components/GoogleGIcon';
@@ -51,10 +51,9 @@ export const PublicReviewPage = () => {
     trackEvent({ type: 'copy_action', businessSlug: slug ?? '', timestamp: new Date().toISOString() });
     trackEvent({ type: 'google_review_click', businessSlug: slug ?? '', timestamp: new Date().toISOString() });
 
-    // Open Google Review Link in new tab
-    if (business.googleReviewUrl) {
-      window.open(business.googleReviewUrl, '_blank', 'noopener,noreferrer');
-    }
+    // Safely open valid Google Review link in new tab (never 400)
+    const targetUrl = getValidGoogleReviewUrl(business.name, business.googleReviewUrl);
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
   const toggleCategory = (cat: string) => {

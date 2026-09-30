@@ -177,7 +177,7 @@ export const EditBusinessPage = () => {
                 <Input
                   id="name"
                   label="Business Name *"
-                  placeholder="e.g. Apex Pinhole Surgery"
+                  placeholder="e.g. Apex Pinhole Surgery Clinic"
                   value={form.name}
                   onChange={(e) => update('name', e.target.value)}
                   error={errors.name}

@@ -34,6 +34,22 @@ export const getReviewPageUrl = (slug: string): string => {
   return `${getAppBaseUrl()}/review/${slug}`;
 };
 
+export const getValidGoogleReviewUrl = (businessName: string, googleReviewUrl?: string): string => {
+  const url = googleReviewUrl ? googleReviewUrl.trim() : '';
+
+  if (
+    url &&
+    !url.includes('placeid=demo') &&
+    !url.endsWith('/writereview') &&
+    !url.endsWith('/writereview?') &&
+    (url.startsWith('http://') || url.startsWith('https://'))
+  ) {
+    return url;
+  }
+
+  return `https://www.google.com/search?q=${encodeURIComponent(businessName + ' reviews write a review')}`;
+};
+
 export const copyToClipboard = async (text: string): Promise<boolean> => {
   try {
     await navigator.clipboard.writeText(text);

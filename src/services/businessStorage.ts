@@ -147,34 +147,46 @@ export const getBusinessBySlug = (slug: string): Business | undefined => {
       b.slug === slug ||
       b.slug.toLowerCase() === slug.toLowerCase() ||
       slugify(b.slug) === normalized ||
+      (normalized.includes('apex-pinhole') && (b.slug.includes('apex-pinhole') || b.id === 'demo-apex-001')) ||
       b.id === slug
   );
 
   if (!biz) {
-    const formattedName = slug
-      .replace(/[-_]+/g, ' ')
-      .trim()
-      .split(/\s+/)
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
+    const isApex = slug.toLowerCase().includes('apex-pinhole');
+    const formattedName = isApex
+      ? 'Apex Pinhole Surgery Clinic'
+      : slug
+          .replace(/[-_]+/g, ' ')
+          .trim()
+          .split(/\s+/)
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(' ');
 
     const fallbackBiz: Business = {
       id: `auto-${slug}`,
       name: formattedName || 'Business Review',
       slug: slug,
       logo: '',
-      description: `Welcome to ${formattedName || 'our business'}! Please share your valuable experience with us below.`,
-      category: 'Customer Experience',
+      description: isApex
+        ? 'Apex Pinhole Surgery Clinic specializes in minimally invasive gum recession treatment using the Chao Pinhole Surgical Technique. We help patients restore healthy gum tissue without traditional grafting surgery, providing faster recovery and exceptional results.'
+        : `Welcome to ${formattedName || 'our business'}! Please share your valuable experience with us below.`,
+      category: isApex ? 'Healthcare' : 'Customer Experience',
       website: '',
       phone: '',
       email: '',
       address: '',
-      services: ['Quality Service', 'Customer Care', 'Client Satisfaction'],
-      googleReviewUrl: 'https://search.google.com/local/writereview',
+      services: isApex
+        ? ['Pinhole Surgical Technique', 'Gum Recession Treatment', 'Oral Health Assessment']
+        : ['Quality Service', 'Customer Care', 'Client Satisfaction'],
+      googleReviewUrl: isApex
+        ? 'https://g.page/r/CboKm_IknM-QEBM/review'
+        : `https://www.google.com/search?q=${encodeURIComponent((formattedName || 'Business') + ' reviews write a review')}`,
       reviewSuggestions: generateAutomaticSuggestions({
         name: formattedName || 'our business',
-        category: 'Customer Experience',
-        services: ['Quality Service', 'Customer Care', 'Client Satisfaction'],
+        category: isApex ? 'Healthcare' : 'Customer Experience',
+        services: isApex
+          ? ['Pinhole Surgical Technique', 'Gum Recession Treatment', 'Oral Health Assessment']
+          : ['Quality Service', 'Customer Care', 'Client Satisfaction'],
       }),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -255,9 +267,8 @@ export const slugExists = (slug: string, excludeId?: string): boolean => {
 // Demo data seed
 export const seedDemoData = (): void => {
   const businesses = getAllBusinesses();
-  if (businesses.some((b) => b.slug === 'apex-pinhole-surgery')) return;
-
-  const demoName = 'Apex Pinhole Surgery';
+  const demoName = 'Apex Pinhole Surgery Clinic';
+  const demoUrl = 'https://g.page/r/CboKm_IknM-QEBM/review';
   const demoServices = [
     'Pinhole Surgical Technique',
     'Gum Recession Treatment',
@@ -267,20 +278,42 @@ export const seedDemoData = (): void => {
     'Minimally Invasive Periodontal Care',
   ];
 
+  const existingIndex = businesses.findIndex(
+    (b) =>
+      b.id === 'demo-apex-001' ||
+      b.slug === 'apex-pinhole-surgery' ||
+      b.slug === 'apex-pinhole-surgery-clinic' ||
+      b.name.toLowerCase().includes('apex pinhole')
+  );
+
+  if (existingIndex >= 0) {
+    const existing = businesses[existingIndex];
+    if (existing.googleReviewUrl !== demoUrl || existing.name !== demoName) {
+      businesses[existingIndex] = {
+        ...existing,
+        name: demoName,
+        googleReviewUrl: demoUrl,
+        updatedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(businesses));
+    }
+    return;
+  }
+
   const demo: Business = {
     id: 'demo-apex-001',
     name: demoName,
     slug: 'apex-pinhole-surgery',
     logo: '',
     description:
-      'Apex Pinhole Surgery specializes in minimally invasive gum recession treatment using the Chao Pinhole Surgical Technique. We help patients restore healthy gum tissue without traditional grafting surgery, providing faster recovery and exceptional results.',
+      'Apex Pinhole Surgery Clinic specializes in minimally invasive gum recession treatment using the Chao Pinhole Surgical Technique. We help patients restore healthy gum tissue without traditional grafting surgery, providing faster recovery and exceptional results.',
     category: 'Healthcare',
     website: 'https://apexpinholeexample.com',
     phone: '(555) 123-4567',
     email: 'info@apexpinholeexample.com',
     address: '123 Dental Way, Los Angeles, CA 90001',
     services: demoServices,
-    googleReviewUrl: 'https://search.google.com/local/writereview?placeid=demo',
+    googleReviewUrl: demoUrl,
     reviewSuggestions: generateAutomaticSuggestions({
       name: demoName,
       category: 'Healthcare',

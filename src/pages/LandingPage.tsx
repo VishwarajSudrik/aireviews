@@ -200,12 +200,12 @@ export const LandingPage = () => (
                   <Star className="w-5 h-5 text-white fill-white" />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900 text-sm">Apex Pinhole Surgery</div>
+                  <div className="font-semibold text-gray-900 text-sm">Apex Pinhole Surgery Clinic</div>
                   <div className="flex text-yellow-400 text-xs">★★★★★</div>
                 </div>
               </div>
               <p className="text-gray-700 text-sm leading-relaxed italic">
-                "The team at Apex Pinhole Surgery made me feel completely at ease. The minimally invasive approach meant almost no downtime, and my results have been amazing."
+                "The team at Apex Pinhole Surgery Clinic made me feel completely at ease. The minimally invasive approach meant almost no downtime, and my results have been amazing."
               </p>
               <div className="flex gap-2 pt-2">
                 <span className="badge bg-purple-100 text-purple-700">Customer Experience</span>
